@@ -1,10 +1,12 @@
-ARG ARCH
-ARG OS
+FROM --platform=$TARGETOS/$TARGETARCH debian:bullseye-slim
 
-FROM $ARCH/debian:$OS
+LABEL author="Michael Parker" maintainer="parker@pterodactyl.io"
 
-ARG ARCH
-ARG OS
+LABEL org.opencontainers.image.source="https://github.com/pterodactyl/yolks"
+LABEL org.opencontainers.image.licenses=MIT
+
+ENV DEBIAN_FRONTEND noninteractive
+
 ARG USER_ID
 ARG GROUP_ID
 
@@ -12,7 +14,7 @@ RUN addgroup --gid $GROUP_ID user; exit 0
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user; exit 0
 
 # Install build dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+RUN apt-get update && apt-get -y install \
     build-essential \
     binfmt-support \
     cpio \
@@ -47,4 +49,4 @@ COPY ./entrypoint.sh /entrypoint.sh
 # Make Executable
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
